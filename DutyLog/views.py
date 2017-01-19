@@ -25,13 +25,13 @@ def index(request):
     leader_user_list = RoleTable.objects.filter(roleflag='2')  # 值班领导
     man_user_list = RoleTable.objects.filter(roleflag='1')  # 值班员
     manager_user_list = RoleTable.objects.filter(roleflag='4')  # 值班科长
-    date_and_time = timezone.now()
+    date_and_time = datetime.now()
     weekdays = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
     weekday = weekdays[datetime.today().weekday()]
     dutyinfo_obj = None
     #dutyinfo_exist_flag = "false"  # 默认不存在，允许添加
     if not page_no:
-        date_str = str(timezone.now())[:10]
+        date_str = str(datetime.now())[:10]
         try:
             dutyinfo_obj = DutyInfo.objects.get(date=date_str)
         except:
@@ -78,7 +78,7 @@ def index(request):
 @csrf_exempt
 def log_handler(request):
     flag = request.POST.get("flag")  #
-    time_now = timezone.now()
+    time_now = datetime.now()
     page_no = request.POST.get("page_no")
 
     if flag == "1":   #值班员点击content按钮
@@ -193,7 +193,8 @@ def archive(request):  #归档
 
 @csrf_exempt
 def sign_in(request):  #值班员签到
-    time_now = timezone.now()
+    time_now = datetime.now()
+    print time_now
     page_no = request.POST.get("page_no")
     duty_leader = request.POST.get("duty_leader").encode('utf8')
     duty_man = request.POST.get("duty_man")
