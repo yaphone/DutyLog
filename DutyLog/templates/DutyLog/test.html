@@ -1,0 +1,225 @@
+{%extends "DutyLog/base.html" %}
+{% block head %}
+
+    <script>
+        function content_submit(){ //值班员
+            var flag = "1";
+            var duty_proxy = $("#duty_proxy").val();
+            var duty_leader = $("#duty_leader").val();
+            var duty_manager = $("#duty_manager").val();
+            var duty_man = $("#duty_man").val();
+            var page_no = $("#page_no").val();
+            var content = $("#content").val();
+            var date = $("#time").text(); //日期
+            var weekday = $("#weekday").text();
+            var weather = $("#weather").val();
+            var temp = $("#temp").val();
+            $.post("log_handler",
+                {flag: flag,
+                duty_proxy: duty_proxy,
+                duty_leader: duty_leader,
+                duty_manager: duty_manager,
+                duty_man: duty_man,
+                content: content,
+                date: date,
+                weekday: weekday,
+                weather: weather,
+                temp: temp,
+                page_no: page_no},
+                function(data){
+                    alert(data['status']);
+                }
+
+            );
+        }
+        function proxy_submit(){ //带班领导
+            var flag = "2";
+            var page_no = $("#page_no").val();
+            var proxy_instruction = $("#proxy_instruction").val();
+            $.post("log_handler",
+                {flag: flag,
+                page_no: page_no,
+                proxy_instruction: proxy_instruction,
+                },
+                function(data){
+                    alert(data['status']);
+                }
+            );
+        }
+        function instruction_submit(){ //值班领导
+            var flag = "3";
+            var page_no = $("#page_no").val();
+            var instruction = $("#instruction").val();
+            $.post("log_handler",
+                {flag: flag,
+                page_no: page_no,
+                instruction: instruction,
+                },
+                function(data){
+                    alert(data['status']);
+                }
+
+            );
+        }
+        function result_submit(){ //办理结果
+            var flag = "4";
+            var page_no = $("#page_no").val();
+            var result = $("#result").val();
+            $.post("log_handler",
+                {flag: flag,
+                page_no: page_no,
+                result: result,
+                },
+                function(data){
+                    alert(data['status']);
+                }
+
+            );
+        }
+
+        $(function(){
+            var roleflag = $("#roleflag").val();
+            if(roleflag == '1'){  //值班员，隐藏值班领导和带班领导按钮
+                $("#content-btn").show();
+                $("#result-btn").show();
+            }
+            if(roleflag == '2'){  //值班领导
+                $("#instruction-btn").show();
+            }
+            if(roleflag == '3'){  //带班领导
+                $("#proxy_instruction-btn").show();
+            }
+        })
+
+        $(function(){ //dutyinfoy设置为数据库的存储值
+            var dutyinfo_exsit_flag = $("#dutyinfo_exsit").val();
+            if(dutyinfo_exsit_flag == "true"){ //值班信息已存在
+                $("#duty_proxy").val($("#dutyinfo_proxy").val());
+                $("#duty_leader").val($("#dutyinfo_leader").val());
+                $("#duty_manager").val($("#dutyinfo_manager").val());
+                $("#duty_man").val($("#dutyinfo_man").val());
+                $("#temp").val($("#dutyinfo_temp").val());
+            }
+        })
+
+        $(function(){
+               var time = new Date();
+               // 程序计时的月从0开始取值后+1
+               var m = time.getMonth() + 1;
+               var t = time.getFullYear() + "-" + m + "-"
+                 + time.getDate();
+               //获取星期几
+               weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+               var index = new Date().getDay();
+               weekday = weekdays[index];
+               $("#time").html(t);
+               $("#weekday").html(weekday);
+
+        })
+
+    </script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 align="center">值 班 日 志</h1>
+        <table class="table table-bordered col-lg-12">
+            <tr>
+                <td id="time" class="col-lg-3" align="center"></td>
+                <td id="weekday" class="col-lg-3" align="center"></td>
+                <td class="col-lg-3">
+                    <select align="center" id="weather" class="form-control">
+                        <option>晴天</option>
+                        <option>多云</option>
+                        <option>阴天</option>
+                        <option>小雨</option>
+                        <option>中雨</option>
+                        <option>大雨</option>
+                        <option>小雪</option>
+                        <option>中雪</option>
+                        <option>大雪</option>
+                        <option>雾霾</option>
+                    </select>
+                </td>
+                <td align="center" class="col-lg-3">
+                    <input id="temp" type="text" class="form-control" placeholder="温度">
+                </td>
+            </tr>
+            <tr id="tr1" class="success">
+                <td align="center" >带班领导</td>
+                <td align="center">
+                    <select id="duty_proxy" class="form-control">
+                        {% for user in proxy_user_list %}
+                            <option>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td align="center">值班领导</td>
+                <td align="center">
+                    <select id="duty_leader" class="form-control">
+                        {% for user in leader_user_list %}
+                            <option>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr id="tr2">
+                <td align="center" >值班科长</td>
+                <td align="center">
+                    <select id="duty_manager" class="form-control">
+                        {% for user in manager_user_list %}
+                            <option>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td align="center">值班员</td>
+                <td align="center">
+                    <select id="duty_man" class="form-control">
+                        {% for user in man_user_list %}
+                            <option>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div align="right">
+            <textarea id="content" class="form-control" rows="7" placeholder="此处填写电话及各类通知">{{ content.content }}</textarea>
+            <button id="content-btn" class="btn btn-sm btn-success" style="display: none" onclick="content_submit()">提交</button>
+        </div>
+        <div align="right">
+            <textarea id="instruction" class="form-control" rows="7" placeholder="此处由值班领导填写指示">{{ instruction_obj.instruction }}</textarea>
+            <button id="instruction-btn" class="btn btn-sm btn-success" style="display: none" onclick="instruction_submit()">提交</button>
+        </div>
+        <div align="right">
+            <textarea id="proxy_instruction" class="form-control" rows="7" placeholder="此处由带班领导填写指示">{{ proxy_instruction_obj.proxy_instruction }}</textarea>
+            <button id="proxy_instruction-btn" class="btn btn-sm btn-success" style="display: none" onclick="proxy_submit()">提交</button>
+        </div>
+        <div align="right">
+            <textarea id="result" class="form-control" rows="6" placeholder="此处为事项办理结果及其它备注说明事宜">{{ result_obj.result }}</textarea>
+            <button id="result-btn" class="btn btn-sm btn-success" style="display: none" onclick="result_submit()">提交</button>
+        </div>
+
+        <div>
+            <nav>
+                <ul id='pager' class="pager">
+                    <li><a id="previous" href="#">上一页</a></li>
+                    <li><input id="page_no" type="hidden" value=1>1</li>
+                    <li><a id="next" href="#">下一页</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div>
+            <input id="roleflag" type="hidden" value={{ roleflag }}>
+            <input id="dutyinfo_exsit" type="hidden" value={{ dutyinfo_exist_flag }}>
+            <input id="dutyinfo_proxy" type="hidden" value={{ dutyinfo.duty_proxy }}>
+            <input id="dutyinfo_leader" type="hidden" value={{ dutyinfo.duty_leader }}>
+            <input id="dutyinfo_manager" type="hidden" value={{ dutyinfo.duty_manager }}>
+            <input id="dutyinfo_man" type="hidden" value={{ dutyinfo.duty_man }}>
+            <input id="dutyinfo_temp" type="hidden" value={{ dutyinfo.temp }}>
+        </div>
+
+    </div>
+
+{% endblock %}

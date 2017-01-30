@@ -1,0 +1,72 @@
+{%extends "DutyLog/base.html" %}
+{% block head %}
+    <script src="http://ojzhmzvhf.bkt.clouddn.com/jquery.js"></script>
+    <link href="http://ok1b0smdq.bkt.clouddn.com/bootstrap.css" rel="stylesheet">
+    <title>后台管理</title>
+
+    <script>
+        function myadmin_login(){
+            var username = $("#username").val();
+            var password = $("#password").val();
+            $.post("myadmin_login",
+                {username: username,
+                 password: password,
+                },
+                function(data){
+                    if(data["status"] == "ok"){
+                        var roleflag = data["roleflag"];
+                        self.location='/dutylog/index?roleflag=' + roleflag;
+                    }
+                    else{
+                        alert(data["msg"]);
+                    }
+                }
+            );
+
+        }
+    </script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <p align="center" style="font-size:24px">秦皇岛边防支队</p>
+        <p align="center" style="font-size:48px">值   班   日   志   系   统</p>
+        <div>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+        </div>
+        <div class="col-lg-4 col-lg-offset-4">
+            <table class="table table-bordered">
+                <tr>
+                    <td align="center">用户名</td>
+                    <td>
+                        <select id="username" class="form-control">
+                            {% if user_list %}
+                                {% for user in user_list %}
+                                    <option>{{user.username}}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">密码</td>
+                    <td align="cener">
+                        <input id="password" class="form-control" type="password">
+                    </td>
+                </tr>
+            </table>
+            <button class="btn btn-success form-control" onclick="myadmin_login()">登陆</button>
+        </div>
+
+    </div>
+{% endblock %}

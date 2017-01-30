@@ -1,0 +1,70 @@
+
+{%extends "blog/base.html" %}
+{% load static %}
+{% block head %}
+    <style>
+        li{
+            list-style:None;
+            float:left;
+        }
+        ul{
+            padding:0;
+            margin:0;
+        }
+    </style>
+    <script>
+        function init() {
+            $.getJSON('/blog/get_all_title_info', function (data) {
+                for(var i in data['blog_titles']){
+                    var info = data['blog_titles'][i];
+                    $("#title_list").append("<tr>" +
+                        "<td align='center'><input type='checkbox' value=" + info['title'] + "></td>" +
+                        "<td align='center'>" + info['title'] + "</td>" +
+                        "</tr>")
+                }
+
+            });
+        }
+        //var md_name_list = []
+        function push_md_name_list() {
+            var md_name_list = [];
+            $("input[type='checkbox']:checked").each(function () {
+                md_name_list.push($(this).val());
+            });
+            $.ajax({
+                url: "/blog/delete",
+                type: "POST",
+                data: {
+                    'title_list': md_name_list.join(',')
+                },
+                traditional: true,
+                success: function (data) {
+                    if(data['status'] == 'OK'){
+                        alert("删除成功");
+                        location.reload();
+                    }
+                }
+            })
+        }
+
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <h1 align="center"> 删除博客 </h1>
+        <hr>
+        <table id="title_list" class="table table-bordered">
+            <tr class="danger">
+                <td></td>
+                <td align="center">标题</td>
+            </tr>
+        </table>
+    </div>
+    <hr>
+
+    <hr>
+
+    <button class="btn-lg btn-danger col-lg-12" id="pushMarkdown" onclick="push_md_name_list()">确定</button>
+
+{% endblock %}

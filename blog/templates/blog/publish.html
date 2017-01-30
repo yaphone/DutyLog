@@ -1,0 +1,72 @@
+{%extends "blog/base.html" %}
+{% load static %}
+{% block head %}
+    <script>
+        function init() {
+            $.getJSON('/blog/get_md_info', function (data) {
+                //alert(data);
+                for(var i in data['md']){
+                    var info = data['md'][i]
+                    $("#md_list").append("<tr> <td align='center'><input type='checkbox' value=" + info['mdName'] +
+                        "></td> <td>" + info['mdName'] + "</td></tr>")
+                }
+
+            });
+        }
+        function push_md_name_list() {
+            var md_name_list = [];
+            $("input[type='checkbox']:checked").each(function () {
+                md_name_list.push($(this).val());
+            });
+            $.ajax({
+                url: "/blog/publish",
+                type: "POST",
+                data: {
+                    'md_name_list': md_name_list.join(',')
+                },
+                traditional: true,
+                success: function (data) {
+                    if(data['status'] == 'success'){
+                        alert("发布成功");
+                        location.reload();
+                    }else if(data['status'] == 'error'){
+                        alert("发布失败，请检查格式");
+                        location.reload();
+                    }
+                }
+            })
+        }
+    </script>
+
+{% endblock %}
+
+
+{% block content %}
+    <div>
+        <h1 align="center"> 发布新博客 </h1>
+        <hr>
+        <table id="md_list" class="table table-bordered">
+            <tr class="success">
+                <td></td>
+                <td align="center">标题</td>
+            </tr>
+        </table>
+    </div>
+    <hr>
+
+    <button class="btn-lg btn-success col-lg-12" id="pushMarkdown" onclick="push_md_name_list()">确定</button>
+
+    <p>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+    </p>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{%extends "DutyLog/base.html" %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <h1 align="center">归档</h1>
+    <hr>
+    {% if dutyinfo_list %}
+    <table class="table table-bordered">
+        <tr class="success">
+            <td align="center">存档时间</td>
+            <td align="center">星期</td>
+            <td align="center">值班员</td>
+            <td align="center">值班领导</td>
+            <td align="center">带班领导</td>
+            <td align="center">值班经理</td>
+            <td align="center">天气情况</td>
+            <td align="center">温度</td>
+
+        </tr>
+        {% for dutyinfo in dutyinfo_list %}
+        <tr>
+            <td align="center"><a href="/dutylog/?page_no={{dutyinfo.page_no}}">{{ dutyinfo.date }}</a></td>
+            <td align="center">{{ dutyinfo.weekday }}</td>
+            <td align="center">{{ dutyinfo.duty_man }}</td>
+            <td align="center">{{ dutyinfo.duty_leader }}</td>
+            <td align="center">{{ dutyinfo.duty_proxy }}</td>
+            <td align="center">{{ dutyinfo.duty_manager }}</td>
+            <td align="center">{{ dutyinfo.weather }}</td>
+            <td align="center">{{ dutyinfo.temp }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+{% endblock %}

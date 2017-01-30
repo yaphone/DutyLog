@@ -1,0 +1,118 @@
+{%extends "blog/base.html" %}
+{% block head %}
+    <script>
+        $(function () {
+            var page_no = parseInt($("#page_no").val());
+            var is_last_page = $("#is_last_page").val();
+            var url = "/blog/index?page_no=";
+            var previous_page_url = url;
+            var next_page_url = url;
+            if (page_no != 0){  //首页
+                previous_page_url = url + String(page_no - 1);
+            }else{
+                $("#previous").hide();
+            }
+            if(is_last_page == "true"){//最后一页
+                $("#next").hide();
+            }else{
+                next_page_url = url + String(page_no + 1);
+            }
+            $("#previous").attr("href", previous_page_url);
+            $("#next").attr("href", next_page_url);
+        })
+        $(function(){
+            $("#search").click(function(){
+                var search_word = $("#search_word").val();
+                var url = '/blog/index?search_word=' + search_word;
+                window.location.href = url;
+
+            });
+        })
+        $(function(){ //是否显示上一页，下一页
+            var page = $("#page").val();
+            if(page == 'false'){
+                $("#pager").hide();
+            }
+        })
+
+        $( function() { $( 'audio' ).audioPlayer(); } );  //音乐播放插件初始化
+    </script>
+
+{% endblock %}
+
+{% block content %}
+{% load custom_markdown %}
+    <div class="col-sm-8 blog-main">
+{% if blog_list %}
+	{% for blog in blog_list%}
+		<div class="blog-post">
+		    <h2 class="blog-post-title" align="center">{{ blog.blog_title}}</h2>
+            <p class="blog-post-meta" align="center">{{ blog.update_time | date:'Y-m-d H:i:s' }} <a href="/blog/detail?title={{blog.blog_title}}">Read more</a></p>
+            <p> {{ blog.blog_content | slice:"100" | custom_markdown}} </p>
+            <hr>
+        </div><!-- /.blog-post -->
+    {% endfor %}
+        <nav>
+            <ul id='pager' class="pager">
+                <li><input id="page" type="hidden" value={{ page }}> </li>
+                <li><input id="page_no" type="hidden" value={{ page_no }}> </li>
+                <li><input id="is_last_page" type="hidden" value={{ is_last_page }}> </li>
+                <li><a id="previous" href="#">Previous</a></li>
+                <li><a id="next" href="#">Next</a></li>
+            </ul>
+        </nav>
+{% endif %}
+{% endblock content %}
+
+{% block blog_sider %}
+<div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+    <div class="sidebar-module sidebar-module-inset">
+        <h4>About</h4>
+        <p>
+            这里是yaphone的博客，此博客基于Django框架，相关源码均开源在
+            <a href="https://github.com/yaphone/django_blog">Github</a>，
+            欢迎大家使用，说明文档正在不断完善，如果你也喜欢，请点个Star，谢谢！
+        </p>
+    </div>
+    <audio controls preload="auto" loop>
+        <source src="http://oj3wjy4b8.bkt.clouddn.com/%E8%B5%B5%E9%9B%B7%20-%20%E6%88%90%E9%83%BD.mp3" type="audio/mpeg" />
+    </audio>
+    <hr>
+    <div>
+        <div class="input-group input-group-lg">
+            <input id="search_word" type="text" class="form-control" placeholder="文章搜索">
+            <span id="search" class="input-group-addon">搜索</span>
+        </div>
+    </div>
+    <hr>
+    <div class="sidebar-module">
+        <ol class="list-unstyled">
+            {% if latest_blog_title_list %}
+            <h4>最近更新</h4>
+                {% for blog_title in latest_blog_title_list %}
+                    <li><a href="/blog/detail?title={{blog_title}}">{{blog_title}}</a></li>
+                {% endfor %}
+            {% endif %}
+        </ol>
+        <hr>
+    </div>
+    <div class="sidebar-module">
+        <ol class="list-unstyled">
+            {% if classify_dict %}
+                <h4>分类</h4>
+                {% for key,value in classify_dict.items %}
+                    <li><a href="/blog/index?classify={{key}}">{{key}}({{value}})</a></li>
+                {% endfor %}
+            {% endif %}
+        </ol>
+    </div>
+    <div class="sidebar-module">
+        <h4>Elsewhere</h4>
+        <ol class="list-unstyled">
+            <li><a href="https://github.com/yaphone">GitHub</a></li>
+        </ol>
+    </div>
+</div><!-- /.blog-sidebar -->
+</div><!-- /.container -->
+
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends "blog/base.html" %}
+{% block head %}
+    <style>
+        .no-border {
+             border: 1px solid transparent !important;
+        }
+        .head_icon {
+            background-color:red;
+            width: 20px;
+            height: 20px;
+            border-radius: 100%;
+	    }
+    </style>
+    <script>
+        $(document).ready(function(){
+            var csrf = $($("input[name='csrfmiddlewaretoken']").get(0)).val();
+            var blog_id = $("#blog_id").val();
+            $("#submit_comment").click(function(){
+                var content = $("#content").val();
+                var nickname = $("#nickname").val();
+                var email = $("#email").val();
+                if($.trim(nickname).length == 0){ //去掉左右空格后长度为零时，检测昵称是否为空
+                    alert("请输入昵称");
+                    return;
+                }
+                if($.trim(email).length == 0 || !validateEmail(email)){ //去掉左右空格后长度为零时，检测昵称是否为空
+                    alert("请输入有效的email地址，此地址仅作为作者回复信息使用，对其他人保密");
+                    return;
+                }
+                if($.trim(content).length == 0){  //去掉左右空格后长度为零时，检测评论内容是否为空
+                    alert("请输入评论内容");
+                    return;
+                }
+                $.ajax({
+                    url: "/blog/comment",
+                    type: "POST",
+                    data: {
+                        'csrfmiddlewaretoken': csrf,
+                        'blog_id': blog_id,
+                        'content': content,
+                        'nickname': nickname,
+                        'email': email,
+                    },
+                    traditional: true,
+                    success: function (data) {
+                        if(data['status'] == 'OK'){
+                            alert("评论成功");
+                            location.reload();
+                        }
+                    }
+                });
+            });
+        });
+        $(function(){
+            $($("button[name='reply']").each(function(){})).click(function(){
+                    var comment_id = $(this).val();
+                    $("#div"+comment_id.toString()).toggle(1000);
+                });
+        });
+        $(function(){ //二级评论
+            $($("button[name='sub_submit_comment']").each(function(){})).click(function(){
+                    var csrf = $($("input[name='csrfmiddlewaretoken']").get(0)).val();
+                    var parent_comment_id = $(this).val();
+                    var sub_comment_content = $("#sub_comment" + parent_comment_id.toString()).val(); //获取二级评论内容
+                    var nickname = $("#sub_nickname" + parent_comment_id.toString()).val();
+                    var email = $("#sub_email" + parent_comment_id.toString()).val();
+                    if($.trim(nickname).length == 0){
+                        alert("请输入昵称");
+                        return;
+                    }
+                    if($.trim(email).length == 0 || !validateEmail(email)){ //去掉左右空格后长度为零时，检测昵称是否为空
+                        alert("请输入有效的email地址，此地址仅作为作者回复信息使用，对其他人保密");
+                        return;
+                    }
+                    if($.trim(content).length == 0){
+                        alert("请输入评论内容");
+                        return;
+                    }
+                    $.ajax({
+                    url: "/blog/sub_comment",
+                    type: "POST",
+                    data: {
+                        'csrfmiddlewaretoken': csrf,
+                        'parent_comment_id': parent_comment_id,
+                        'sub_comment_content': sub_comment_content,
+                        'nickname': nickname,
+                        'email': email,
+                    },
+                    traditional: true,
+                    success: function (data) {
+                        if(data['status'] == 'OK'){
+                            alert("评论成功");
+                            location.reload();
+                        }
+                    }
+                });
+                });
+        });
+        $(function(){ //打开or关闭评论内容
+            $("#comment_button").click(function(){
+                $("#comment_div").toggle(1000);
+            });
+        });
+        $(function(){  //给每条评论加个圆形头像，更美观些吧
+            var colors = ["red", "blue", "green", "yellow", "black", "grey"];
+            $(".head_icon").each(function(){
+                var index = Math.floor(Math.random()*5);
+                $(this).css('background-color', colors[index]);
+            });
+        })
+        $(function(){ //如果有背景音乐，添加之
+            var music = $("#music").html();
+            if(music != "null"){
+                $("#music_url").css("display", "inline");    //显示音乐控制框
+                $("#music_url source").attr("src", music);
+                $("#music_url")[0].load();
+            }
+        });
+        function validateEmail(email) { //检测email是否有效函数
+           var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+
+        //$( function() { $( 'audio' ).audioPlayer(); } );  //音乐播放插件初始化
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="col-lg-12 blog-main">
+{% load custom_markdown %}
+{% if blog %}
+        <div class="blog-post">
+            <h2 class="blog-post-title" align="center">{{ blog.blog_title}}</h2>
+            <p class="blog-post-meta" align="center">{{ blog.update_time | date:'Y-m-d H:i:s' }}阅读次数:{{ blog.reading_count }}
+                <span id="music" style="display:none">{{blog.music}}</span>
+                <br/>
+                <audio id="music_url" style="display:none" autoplay controls loop><source src="" /></audio>
+            </p>
+            <hr>
+            <p> {{ blog.blog_content | custom_markdown  }} </p>
+            <hr>
+        </div><!-- /.blog-post -->
+        <button id="comment_button" class="btn-lg btn-primary col-lg-12">评论</button>
+        <hr>
+        <hr>
+        <div id="comment_div" style="display:none; background-color:#F5F5F5"><!--文章评论-->
+            <hr/>
+            {% if comment_list %}
+                {% for comment in comment_list %}
+                    <div>
+                        <p style="text-align:left; font-size:10px; color:green">
+                            <span><button class="head_icon"></button></span>
+                            <span style="color:red;">{{comment.nickname}}</span> 发表于
+                            <span style="color:black">{{comment.comment_time}}</span>
+                            <button value={{comment.id}} name="reply"> 回复 </button></p>
+                        <p>{{comment.content | custom_markdown}}</p>
+                        <hr/>
+                        {% if sub_comment_list%}
+                            {% for sub_comment in sub_comment_list %}
+                                {% if sub_comment.comment_id == comment.id %}<!-- 二级评论 -->
+                                    <div style="background-color:#D0D0D0">
+                                        <p style="font-size:10px; color:green">
+                                            <span style="padding-left:2em;"></span>
+                                            <span><button class="head_icon"></button></span>
+                                            <span style="color:red;">{{sub_comment.nickname}}</span> 发表于
+                                            <span style="color:black">{{sub_comment.comment_time}}</span></p>
+                                        <span style="padding-left:2em;"></span><span style="font-size: 14px; color:blue">{{sub_comment.content}}</span>
+                                    </div>
+                                    <!-- <p style="text-align:right; font-size:8px; color:green">评论时间：{{comment.comment_time}}</p> -->
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        <div id="div{{comment.id}}" style="display:none">
+                            <input id="sub_nickname{{comment.id}}" class="col-lg-6" placeholder="请输入昵称">
+                            <input id="sub_email{{comment.id}}" class="col-lg-6" type="email" placeholder="请输入邮箱，此内容保密">
+                            <textarea id="sub_comment{{comment.id}}" name="content" class="form-control" rows="5" placeholder="扯淡、吐槽，想说啥说啥，评论支持markdown语法哦"></textarea>
+                            <button name="sub_submit_comment" value="{{comment.id}}" class="col-lg-12 btn-success btn-sm">提交评论</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        <hr>
+            <div><!--评论框-->
+                <form role="form" action="/blog/comment" method="post">
+                    <div class="form-group">
+                        {% csrf_token %}
+                        <input id="blog_id" type="hidden" name="blog_id" value={{blog.id}}>  <!-- 一级评论在保存时用的foreign key是blog id -->
+                        <input id="nickname" class="col-lg-12" placeholder="请输入昵称">
+                        <input id="email" class="col-lg-12" type="email" placeholder="请输入邮箱，此内容保密">
+                        <textarea id="content" name="content" class="form-control" rows="5" placeholder="扯淡、吐槽，想说啥说啥，评论支持markdown语法哦"></textarea>
+                    </div>
+                </form>
+                <button id="submit_comment" class="col-lg-12 btn-success btn-lg">提交评论</button>
+            </div>
+        <hr>
+        </div><!--文章评论结束-->
+
+{% endif %}
+{% endblock %}
+    </div><!--main container>

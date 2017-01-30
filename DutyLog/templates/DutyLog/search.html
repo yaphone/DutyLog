@@ -1,0 +1,88 @@
+{%extends "DutyLog/base.html" %}
+{% block head %}
+
+    <script>
+        $(function(){
+            $("#search_btn").click(function(){
+                var keyword = $("#keyword").val();
+                var url = '/dutylog/search?keyword=' + keyword;
+                $.get(url, function(data){
+                    if(data["status"] == "ok"){
+                        var page_no_list = data["page_no_list"];
+                        for(var i=0; i<page_no_list.length; i++){
+                            //alert(page_no_list[i]);
+                            url = "/dutylog/get_dutyinfo_by_page_no?page_no=" + page_no_list[i];
+                            $.get(url, function(data){
+                                if(data['status'] == "ok"){
+                                    var date = data['date'];
+                                    var weekday = data['weekday'];
+                                    var duty_man = data['duty_man'];
+                                    var duty_leader = data['duty_leader'];
+                                    var duty_manager = data['duty_manager'];
+                                    var duty_proxy = data['duty_proxy'];
+                                    var weather = data['weather'];
+                                    var temp = data['temp'];
+                                    var page_no = data['page_no'];
+                                    $("#search_table").append("<tr>" +
+                                        "<td align='center'><a href='/dutylog/?page_no=" + page_no + "'>" + date + "</td>" +
+                                        "<td align='center'>" + weekday + "</td>" +
+                                        "<td align='center'>" + duty_man + "</td>" +
+                                        "<td align='center'>" + duty_leader + "</td>" +
+                                        "<td align='center'>" + duty_proxy + "</td>" +
+                                        "<td align='center'>" + duty_manager + "</td>" +
+                                        "<td align='center'>" + weather + "</td>" +
+                                        "<td align='center'>" + temp + "</td>" +
+                                        "</tr>")
+                                }
+                            })
+                        }
+                    }else{
+                        alert(data["status"]);
+                    }
+                })
+            });
+        })
+    </script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <h1 align="center">搜索</h1>
+        <br/>
+        <hr/>
+
+        <div class="input-group input-group-lg">
+            <input id="keyword" type="text" class="form-control" placeholder="关键字搜索">
+            <span id="search_btn" class="input-group-addon">搜索</span>
+        </div>
+        <hr/>
+
+        <div>
+            <table id="search_table" class="table table-bordered">
+                <tr class="success">
+                    <td align="center">存档时间</td>
+                    <td align="center">星期</td>
+                    <td align="center">值班员</td>
+                    <td align="center">值班领导</td>
+                    <td align="center">带班领导</td>
+                    <td align="center">值班经理</td>
+                    <td align="center">天气情况</td>
+                    <td align="center">温度</td>
+
+                </tr>
+                <!-- <tr>
+                    <td align="center"><a href="/dutylog/?page_no={{dutyinfo.page_no}}">{{ dutyinfo.date }}</a></td>
+                    <td align="center">{{ dutyinfo.weekday }}</td>
+                    <td align="center">{{ dutyinfo.duty_man }}</td>
+                    <td align="center">{{ dutyinfo.duty_leader }}</td>
+                    <td align="center">{{ dutyinfo.duty_proxy }}</td>
+                    <td align="center">{{ dutyinfo.duty_manager }}</td>
+                    <td align="center">{{ dutyinfo.weather }}</td>
+                    <td align="center">{{ dutyinfo.temp }}</td>
+                </tr> -->
+            </table>
+        </div>
+    </div>
+{% endblock %}

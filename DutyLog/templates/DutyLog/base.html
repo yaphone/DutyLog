@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	    {% load static %}
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <!-- CSS -->
+            <link href="{% static 'blog/css/blog.css' %}" rel="stylesheet">
+            <link href="{% static 'blog/css/bootstrap.css' %}" rel="stylesheet">
+            <script src="{% static 'blog/js/jquery.js' type='text/javascript' %}" > </script>
+        {% block head %}
+        {% endblock %}
+  </head>
+
+  <body>
+
+    <div class="blog-masthead">
+      <div class="container">
+        <nav class="blog-nav">
+            <a class="blog-nav-item" href="/dutylog">首页</a>
+            <a class="blog-nav-item" href="/dutylog/archive">归档</a>
+            <a class="blog-nav-item" href="/dutylog/search">搜索</a>
+            <a class="blog-nav-item" href="/dutylog/myadmin">登陆</a>
+            <!-- <a class="blog-nav-item" href="/blog/user_logout">退出</a> -->
+        </nav>
+      </div>
+    </div>
+
+
+    {% block content %}
+    {% endblock %}
+
+
+    <footer class="blog-footer">
+      <p>Powered by @中国有我一定黄</p>
+    </footer>
+  </body>
+</html>

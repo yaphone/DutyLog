@@ -1,0 +1,35 @@
+{% extends "blog/base.html" %}
+{% block content %}
+
+      <form action="/blog/auth" method="post">
+		{% csrf_token %}
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <label for="inputUsername" class="sr-only">Username</label>
+        <input type="text" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>
+        <input type="submit" class="btn btn-lg btn-primary btn-block" >Sign in</form>
+      </form>
+
+        <form action="/blog/auth" method="post" >
+            {% csrf_token %}
+            {% if next %}
+            <input type="text" name="next" value="{{ next }}" />
+            {% endif %}
+            username:
+            <input type="text" name="username" value="{{ username }}" /><br />
+            password:
+            <input type="password" name="password" value="" /><br />
+
+            <input type="submit" value="Log In"/>
+
+        </form>
+{% endblock %}
+	  
+
+</html>
