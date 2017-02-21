@@ -1,8 +1,8 @@
 #coding=utf-8
 
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#import sys
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 from django.shortcuts import render
 from .models import DutyInfo, ContentTable, InstructionTable, ResultTable, ProxyInstructionTable, RoleTable
@@ -15,10 +15,10 @@ from datetime import datetime
 
 # Create your views here.
 
-@login_required
+#@login_required
 def index(request):
     roleflag = request.GET.get("roleflag")
-    #dutyinfo_exist_flag = "false"  # 值班信息是否已经存在标志
+    dutyinfo_exist_flag = "false"  # 值班信息是否已经存在标志
     page_no = request.GET.get("page_no")
     # 用户信息
     proxy_user_list = RoleTable.objects.filter(roleflag='3')  # 带班领导
@@ -29,7 +29,6 @@ def index(request):
     weekdays = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
     weekday = weekdays[datetime.today().weekday()]
     dutyinfo_obj = None
-    #dutyinfo_exist_flag = "false"  # 默认不存在，允许添加
     if not page_no:
         date_str = str(datetime.now())[:10]
         try:
@@ -38,6 +37,7 @@ def index(request):
             pass
         if dutyinfo_obj:#如果能找到，说明已经存在，查找页码
             page_no = dutyinfo_obj.page_no
+            dutyinfo_exist_flag = "true"
         else:
             dutyinfo_obj_list = DutyInfo.objects.order_by('-page_no')
             if dutyinfo_obj_list:
@@ -49,6 +49,7 @@ def index(request):
         pass
     try:
         dutyinfo_obj = DutyInfo.objects.get(page_no=page_no)  # 值班员信息
+        dutyinfo_exist_flag = "true"
     except:
         dutyinfo_obj = None
     try:
@@ -69,7 +70,7 @@ def index(request):
         result_obj = None
 
 
-    context = {"dutyinfo": dutyinfo_obj, "content": content_obj, "instruction_obj": instruction_obj, "page_no": page_no,
+    context = {"dutyinfo": dutyinfo_obj, "content": content_obj, "instruction_obj": instruction_obj, "page_no": page_no, "dutyinfo_exist_flag": dutyinfo_exist_flag,
                "proxy_instruction_obj": proxy_instruction_obj, "result_obj": result_obj, "roleflag": roleflag,  "date_and_time":date_and_time, "weekday":weekday,
                "proxy_user_list": proxy_user_list, "manager_user_list": manager_user_list, "man_user_list": man_user_list, "leader_user_list": leader_user_list}
 
@@ -137,14 +138,14 @@ def log_handler(request):
         result_obj.save()
         return JsonResponse({"status": "ok"})
 
-@login_required
+
 def myadmin(request):
     user_list = RoleTable.objects.order_by('username')
     context = {"user_list": user_list}
     return render(request, "DutyLog/myadmin.html", context)
 
 @csrf_exempt
-@login_required
+#@login_required
 def adduser(request):
     if request.method == "GET":
         return render(request, "DutyLog/adduser.html")
@@ -162,7 +163,6 @@ def adduser(request):
         return JsonResponse({"status": "增加成功"})
 
 @csrf_exempt
-@login_required
 def myadmin_login(request):#用户登陆后的处理页面
     status = "error"
     msg = ""
@@ -179,7 +179,7 @@ def myadmin_login(request):#用户登陆后的处理页面
             roleflag = user_obj.roleflag
         else:
             status = "error"
-            msg = "密码错误"
+            msg = "兄台，密码错了"
     else:
         status = "error"
         msg = "密码错误"
@@ -194,7 +194,6 @@ def archive(request):  #归档
 @csrf_exempt
 def sign_in(request):  #值班员签到
     time_now = datetime.now()
-    print time_now
     page_no = request.POST.get("page_no")
     duty_leader = request.POST.get("duty_leader").encode('utf8')
     duty_man = request.POST.get("duty_man")
@@ -223,7 +222,7 @@ def sign_in(request):  #值班员签到
                                 duty_manager=duty_manager, duty_proxy=duty_proxy,
                                 date=date, weekday=weekday, weather=weather, temp=temp)
     dutyinfo_obj.save()
-    return JsonResponse({"status": u"签到成功"})
+    return JsonResponse({"status": u"您今日签到成功"})
 
 # 是否允许新增,根据日期从数据库中查找dutyinfo，如果能找到，说明存在，不允许新增，否则允许新增
 def get_sign_in_flag(request):

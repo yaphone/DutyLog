@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    #url(r'^$', views.myadmin, name='index'),
     url(r'index', views.index, name="index2"),
     url(r'log_handler$', views.log_handler, name="log_handler"),
     url(r'myadmin$', views.myadmin, name="myadmin"),

@@ -16,7 +16,7 @@ class DutyInfo(models.Model):
     duty_manager = models.CharField(max_length = 128)
     duty_proxy= models.CharField(max_length = 128)   #带班领导
     date = models.CharField(max_length = 128, default="2017-1-1") #日期
-    weekday = models.CharField(max_length = 128) #
+    weekday = models.CharField(max_length = 128, default="NULL") #
     weather = models.CharField(max_length = 128) #
     temp = models.CharField(max_length = 128)
     page_no = models.IntegerField()

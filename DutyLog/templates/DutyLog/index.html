@@ -13,7 +13,9 @@
                 page_no: page_no
                 },
                 function(data){
-                    alert(data['status']);
+                    if(data['status'] == "ok"){
+                        alert("提交成功");
+                    }
                 }
 
             );
@@ -28,7 +30,9 @@
                 proxy_instruction: proxy_instruction,
                 },
                 function(data){
-                    alert(data['status']);
+                    if(data['status'] == "ok"){
+                        alert("提交成功");
+                    }
                 }
             );
         }
@@ -42,7 +46,9 @@
                 instruction: instruction,
                 },
                 function(data){
-                    alert(data['status']);
+                    if(data['status'] == "ok"){
+                        alert("提交成功");
+                    }
                 }
 
             );
@@ -57,7 +63,9 @@
                 result: result,
                 },
                 function(data){
-                    alert(data['status']);
+                    if(data['status'] == "ok"){
+                        alert("提交成功");
+                    }
                 }
 
             );
@@ -85,6 +93,8 @@
                 $("#duty_manager").val($("#dutyinfo_manager").val());
                 $("#duty_man").val($("#dutyinfo_man").val());
                 $("#temp").val($("#dutyinfo_temp").val());
+				tepm = $("#dutyinfo_temp").val();
+				
             }
         })
 
@@ -215,19 +225,19 @@
             </tr>
         </table>
         <div align="right">
-            <textarea id="content" class="form-control" rows="14" placeholder="此处填写电话及各类通知">{{ content.content }}</textarea>
+            <textarea id="content" class="form-control" rows="14" placeholder="此处由值班员填写电话及各类通知。如：1、总队情报科王宁通知林文昌于2017年3月8日参加总队情报奖励大会。电话18903111234，时间上午11时40分。">{{ content.content }}</textarea>
             <button id="content-btn" class="btn btn-sm btn-success" style="display: none" onclick="content_submit()">提交</button>
         </div>
         <div align="right">
-            <textarea id="instruction" class="form-control" rows="7" placeholder="此处由值班领导填写指示">{{ instruction_obj.instruction }}</textarea>
+            <textarea id="instruction" class="form-control" rows="7" placeholder="此处由值班领导填写指示。如：拟通知林文昌同志按照通知要求及时参加，提前做订票准备工作。王子龙 上午11时45分。">{{ instruction_obj.instruction }}</textarea>
             <button id="instruction-btn" class="btn btn-sm btn-success" style="display: none" onclick="instruction_submit()">提交</button>
         </div>
         <div align="right">
-            <textarea id="proxy_instruction" class="form-control" rows="7" placeholder="此处由带班领导填写指示">{{ proxy_instruction_obj.proxy_instruction }}</textarea>
+            <textarea id="proxy_instruction" class="form-control" rows="7" placeholder="此处由带班领导填写指示。如：同意。曹国锋 12时10分。">{{ proxy_instruction_obj.proxy_instruction }}</textarea>
             <button id="proxy_instruction-btn" class="btn btn-sm btn-success" style="display: none" onclick="proxy_submit()">提交</button>
         </div>
         <div align="right">
-            <textarea id="result" class="form-control" rows="6" placeholder="此处为事项办理结果及其它备注说明事宜">{{ result_obj.result }}</textarea>
+            <textarea id="result" class="form-control" rows="6" placeholder="此处由值班员负责将事项办理结果、其它当天未办理完结的事情及其他备注说明事宜。如：已通知林文昌本人按照要求参加。">{{ result_obj.result }}</textarea>
             <button id="result-btn" class="btn btn-sm btn-success" style="display: none" onclick="result_submit()">提交</button>
         </div>
 

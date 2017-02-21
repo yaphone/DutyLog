@@ -13,14 +13,14 @@
             <td align="center">值班员</td>
             <td align="center">值班领导</td>
             <td align="center">带班领导</td>
-            <td align="center">值班经理</td>
+            <td align="center">值班科长</td>
             <td align="center">天气情况</td>
             <td align="center">温度</td>
 
         </tr>
         {% for dutyinfo in dutyinfo_list %}
         <tr>
-            <td align="center"><a href="/dutylog/?page_no={{dutyinfo.page_no}}">{{ dutyinfo.date }}</a></td>
+            <td align="center"><a href="/dutylog/index?page_no={{dutyinfo.page_no}}">{{ dutyinfo.date }}</a></td>
             <td align="center">{{ dutyinfo.weekday }}</td>
             <td align="center">{{ dutyinfo.duty_man }}</td>
             <td align="center">{{ dutyinfo.duty_leader }}</td>
